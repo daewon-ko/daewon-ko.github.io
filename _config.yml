@@ -1,5 +1,5 @@
-title : Elementary - Jekyll Blog Theme
-name: 'Elementary Jekyll Theme'
+title : 지속하여 생각하고 고민하는
+name: '지속하여 생각하고 고민하는'
 description: 'Simple, light weight, responsive jekyll theme for hackers'
 
 markdown: kramdown
@@ -16,12 +16,20 @@ featured_posts:
     title: 'Featured post #3'
 
 collections:
-  news:
-    title: News
-    default_open: false
+  java:
+    title: java
+    default_open: true
     output: true
-  posts:
-    title: Essays
+  spring:
+    title: spring
+    default_open: true
+    output: true
+  os:
+    title: OS
+    default_open: true
+    output: true
+  network:
+    title: Network
     default_open: true
     output: true
 
