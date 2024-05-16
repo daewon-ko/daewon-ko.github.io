@@ -32,6 +32,10 @@ collections:
     title: Network
     default_open: true
     output: true
+  project:
+    title: project
+    default_open: true
+    output: true
 
 defaults:
   - scope:
