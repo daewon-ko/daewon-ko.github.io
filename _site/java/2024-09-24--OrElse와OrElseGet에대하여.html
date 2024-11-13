@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="description" content="OrElse / OrElseGet의 차이에 대하여" />
+  <link rel="canonical" href="http://localhost:4000/java/2024-09-24--OrElse%EC%99%80OrElseGet%EC%97%90%EB%8C%80%ED%95%98%EC%97%AC.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preload" href="/assets/fonts/open-sans-v17-latin-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="preload" href="/assets/fonts/open-sans-v17-latin-regular.woff" as="font" type="font/woff" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/main.css"/>
+  <link rel="alternate" type="application/rss+xml" title="지속하여 생각하고 고민하는" href="/feed.xml" />
+  <title>OrElse와 OrElseGet의 차이에 대해서 &middot; 지속하여 생각하고 고민하는</title>
+  
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "author": "",
+        "datePublished": "2024-09-24T00:00:00+09:00",
+        "headline": "OrElse와 OrElseGet의 차이에 대해서",
+        "url": "http://localhost:4000/java/2024-09-24--OrElse%EC%99%80OrElseGet%EC%97%90%EB%8C%80%ED%95%98%EC%97%AC.html",
+        "inLanguage": "en-US",
+        "isFamilyFriendly": "true",
+        "keywords": "java",
+        "image": "http://localhost:4000/favicon.ico",
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "http://localhost:4000/java/2024-09-24--OrElse%EC%99%80OrElseGet%EC%97%90%EB%8C%80%ED%95%98%EC%97%AC.html"
+       }
+      }
+    </script>
+  
+</head>
+
+<body>
+<div class="container">
+  <nav class="top-nav">
+  <a class="nav-item" href='/'>Home</a>
+  | <a class="nav-item" href='/tags'>Tags</a>
+  | <a class="nav-item" href='/about'>About</a>
+  | <a class="nav-item" href="/feed.xml">RSS</a>
+  | <a class="nav-item dark-light-switch" href="#"></a>
+</nav>
+
+  <hr class="stylish"/>
+  <div class="_progress-wrapper">
+  <div id="_progress"></div>
+</div>
+
+<header>
+  <h1>OrElse와 OrElseGet의 차이에 대해서</h1>
+  <header class="title-tags">
+    <time datetime="2024-09-24T00:00:00+09:00">24 September, 2024. It was a Tuesday.</time>
+    <div class="tags-container">
+      Posted under <span>
+          
+            <a class="tags" href="/tags#java">java</a>
+          
+        </span>
+      &nbsp;
+    </div>
+  </header>
+</header>
+
+<hr class="stylish" />
+
+<main role="main">
+
+  <article>
+
+    <section class="content">
+      <h1 id="orelse--orelseget의-차이에-대하여">OrElse / OrElseGet의 차이에 대하여</h1>
+
+<h3 id="배경">배경</h3>
+<p>테스트 코드 작성 중, Optional의 값을 반환하는 중 Get으로 꺼내기에는 null처리에서 부담이 있어서 관련 메서드 체이닝을 확인하다가 OrElseGet, OrElse라는 메서드를 확인했다. 무엇으로 테스트 코드를 작성해주는게 좋을까라는 생각이 들다가, 가만히 보니 둘의 차이점을 잘 모르는 것 같았다. 이번 기회에 정리해본다.</p>
+
+<h3 id="orelse">OrElse</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public T orElse(T other)
+</code></pre></div></div>
+<p>T의 모든 매개변수를 사용</p>
+
+<h3 id="orelseget">OrElseGet</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public T orElseGet(Supplier&lt;? extends T&gt; Other)
+</code></pre></div></div>
+<p>T를 상속하는 클래스를 반환하는 Supplier 유형의 인터페이스 허용
+    * Supplier 메서드의 경우, Optional의 값이 없을때만 인자로 제공된 Supplier 메서드가 실행된다.</p>
+
+<h3 id="orelse에서-null이-아니어도-로직이-호출되는-이유">OrElse에서 Null이 아니어도 로직이 호출되는 이유</h3>
+<ul>
+  <li>OrElse메서드를 사용하다보면, Optional에서 null이 아닌 값이 조회하는되도 불구하고 orElse내부에서 정의한 메서드 등이 호출되는 경우가 있다.</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">orelseget</span><span class="p">;</span>
+
+<span class="n">import</span> <span class="n">java</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">Optional</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="n">class</span> <span class="n">CouponMain</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="n">static</span> <span class="n">void</span> <span class="n">main</span><span class="p">(</span><span class="k">String</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">Coupon</span> <span class="n">coupon</span> <span class="p">=</span> <span class="n">new</span> <span class="n">Coupon</span><span class="p">(</span><span class="s2">"Hello"</span><span class="p">);</span>
+
+        <span class="n">Coupon</span> <span class="n">elseCoupon</span> <span class="p">=</span> <span class="n">Optional</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="n">coupon</span><span class="p">).</span><span class="n">orElse</span><span class="p">(</span><span class="n">giveAnotherCoupon</span><span class="p">());</span>
+        <span class="nf">System</span><span class="p">.</span><span class="n">out</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s2">"elseCoupon = "</span> <span class="p">+</span> <span class="n">elseCoupon</span><span class="p">);</span>
+
+        <span class="n">Coupon</span> <span class="n">elseGetCoupon</span> <span class="p">=</span> <span class="n">Optional</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="n">coupon</span><span class="p">).</span><span class="n">orElseGet</span><span class="p">(()</span> <span class="p">-&gt;</span> <span class="n">giveAnotherCoupon</span><span class="p">());</span>
+        <span class="nf">System</span><span class="p">.</span><span class="n">out</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s2">"elseGetCoupon = "</span> <span class="p">+</span> <span class="n">elseGetCoupon</span><span class="p">);</span>
+
+
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">static</span> <span class="n">Coupon</span> <span class="n">giveAnotherCoupon</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nf">System</span><span class="p">.</span><span class="n">out</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s2">"Call give Another Coupon!!"</span><span class="p">);</span>
+        <span class="n">return</span> <span class="n">new</span> <span class="n">Coupon</span><span class="p">(</span><span class="s2">"Another Coupon!!"</span><span class="p">);</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+
+</code></pre></div></div>
+
+<p><img src="https://github.com/user-attachments/assets/0d703c69-20da-4747-ba1b-0642ca37f0ad" alt="image" /></p>
+
+<ul>
+  <li>orElse는 T를 Return하는 메서드를 호출 시, 내부 로직이 실행된다.</li>
+  <li>orElseGet는 내부의 값이 null일경우에만 내부로직이 실행된다.
+    <ul>
+      <li>이는 내부적으로 orElseGet의 경우 supplier.get()메서드를 통해 메서드가 실행되기 때문이다.</li>
+    </ul>
+  </li>
+  <li>따라서 동일한 메서드를 실행한다해도 orElseGet이 orElse보다 성능상으로 앞선다.</li>
+</ul>
+
+<h3 id="주의점">주의점</h3>
+<p>위의 예시가 메서드 내부에서 출력을하는 예제라 좀 덜 직관적일 수 있으나, 만약 다음과 JPA를 사용하는데 Entity를 변경하는 로직이 들어있다고 가정하면 어떨까? 가장 직관적인 User Entity를 가정해보자</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public User findByUsername(String username){
+return userRepository.findByUsername(username).orElse(createUserWithName(username));}
+
+
+public User createUserWithName(String username){
+User user = new User(username);
+userRepository.save(username);
+}
+
+</code></pre></div></div>
+<p>UserRepository에서 조회한 결과가 null이 아님에도 불구하고 createUserWithName 내부의 로직이 실행됨에 따라서 불필요한 User가 생성될 수 있다. 그런데 만약 username이 비즈니스 조건에 따라서 Unique 제약 조건이 걸려있다면 당연히 Exception이 발생할 것이다.</p>
+
+<h3 id="결론">결론</h3>
+<p>OrElse / OrElseGet의 차이점을 잘 알고써야하지만, 개인적인 생각에는 OrElse내부에는 T객체를 직접 리턴하는 방식으로 작성하고, 메서드 호출은 최대한 지양해야할 것 같다. 메서드 호출을 방식으로 작성하려면 반드시 orElseGet으로 작성하는 것이 본래 코드의 목적에 부합할 듯 싶다.</p>
+
+<p>참고</p>
+
+<p><a href="https://giron.tistory.com/153">블로그1</a></p>
+
+<p><a href="https://cfdf.tistory.com/34">블로그2</a></p>
+
+    </section>
+
+    <hr class="stylish"/>
+
+
+    <section class="pagination">
+      
+      <a class="prev" href="/java/2024-05-06--%E1%84%8C%E1%85%A1%E1%84%87%E1%85%A1%E1%84%89%E1%85%B3%E1%84%90%E1%85%A5%E1%84%83%E1%85%B5%202%E1%84%8C%E1%85%AE%E1%84%8E%E1%85%A1%20%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%90%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B8,%20%E1%84%87%E1%85%A7%E1%86%AB%E1%84%89%E1%85%AE,%20%E1%84%87%E1%85%A2%E1%84%8B%E1%85%A7%E1%86%AF.html">&laquo; 백기선 자바스터디 2주차 자바 데이터 타입, 변수, 배열</a>
+      
+      
+      <a class="next" href="/java/2024-11-13--%EB%9E%8C%EB%8B%A4%EC%BA%A1%EC%B2%98%EB%A7%81.html">람다 캡쳐링 &raquo;</a>
+      
+    </section>
+
+  </article>
+
+</main>
+
+</div>
+<footer>
+  <hr class="stylish"/>
+  <nav class="top-nav">
+  <a class="nav-item" href='/'>Home</a>
+  | <a class="nav-item" href='/tags'>Tags</a>
+  | <a class="nav-item" href='/about'>About</a>
+  | <a class="nav-item" href="/feed.xml">RSS</a>
+  | <a class="nav-item dark-light-switch" href="#"></a>
+</nav>
+
+  <div>
+    Theme: <a href="https://github.com/abhn/Elementary">Elementary</a>
+    <br/>
+    <a>지속하여 생각하고 고민하는</a> &copy; 2024
+  </div>
+</footer>
+
+  <script src="/assets/main.js"></script>
+
+</body>
+</html>
