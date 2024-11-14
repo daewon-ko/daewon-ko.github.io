@@ -24,6 +24,10 @@ collections:
     title: spring
     default_open: true
     output: true
+  jpa:
+   title: jpa
+   default_open: true
+   output: true
   os:
     title: OS
     default_open: true
