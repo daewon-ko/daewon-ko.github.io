@@ -1,6 +1,6 @@
-I"+<h1 id="jpametamodelmappingcontext">@JpaMetaModelMappingContext</h1>
+I",<h1 id="jpametamodelmappingcontext">@JpaMetaModelMappingContext</h1>
 
-<p>@JpaMetaModelMappingContext란?</p>
+<p>#@JpaMetaModelMappingContext란?</p>
 
 <ul>
   <li>JPA를 사용할때, Entity에 대한 매핑 정보를 제공하는 클래스</li>
